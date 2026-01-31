@@ -1,0 +1,52 @@
+1.playwright核心的三个对象：
+(1)Brower:一个brower实例代表一个浏览器
+(2)BrowerContext；一个独立的浏览器会话，使得你可以在一个浏览器中同时运行多个互不影响的自动化任务，就像你在隐身模式下打开了多个标签页一样。
+(3)Page: 进行实际操作的地方。
+
+2.编写实例：
+const { chromium } = require('playwright');//从 Playwright 库中导入 chromium 模块。你可以根据需要替换为 firefox 或 webkit。
+
+(async () => {
+  // 启动浏览器，并创建一个新的浏览器上下文。
+  const browser = await chromium.launch({ headless: false }); // headless: false 会显示浏览器窗口，本局启动浏览器
+  const context = await browser.newContext();
+  const page = await context.newPage();//打开一个新的浏览器标签页
+
+  // 导航到你想要访问的网站。
+  await page.goto('https://www.baidu.com');//await page.goto('');
+
+  // 在搜索框中输入文本。
+  await page.fill('#kw', 'Playwright');
+
+  // 按下回车键或点击搜索按钮。
+  await page.press('#kw', 'Enter');
+
+  // 等待导航完成，这很重要，以确保页面加载完毕。
+  await page.waitForNavigation();
+
+  // 截图并保存。
+  await page.screenshot({ path: 'baidu_search_results.png' });
+
+  // 打印当前页面的标题。
+  console.log(`页面标题是: ${await page.title()}`);
+
+  // 关闭浏览器。
+  await browser.close();
+})();
+
+3.基础操作
+（1）await page.goto('https://example.com', { waitUntil: 'domcontentloaded' });
+（2）await page.reload({ waitUntil: 'networkidle' });
+（3）await page.goto('https://example.com');
+await page.goto('https://playwright.dev');
+
+await page.goBack();   // 返回 example.com
+await page.goForward(); // 前进到 playwright.dev
+（4）await page.waitForLoadState('networkidle'); // 等待网络空闲
+await page.waitForSelector('#main-content'); // 等待元素出现
+
+4.交互：
+（1）点击：await page.click('#submit', { button: 'right' }); // 右键点击
+await page.dblclick('#submit'); // 双击
+（2）输入：await page.fill('input[name="username"]', 'test_user');
+await page.type('input[name="search"]', 'playwright', { delay: 200 });
